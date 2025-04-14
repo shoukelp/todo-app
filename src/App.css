@@ -1,0 +1,318 @@
+/* App.css */
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f4f6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* Container utama */
+.container {
+  background-color: #fff;
+  padding: clamp(20px, 5vw, 40px);
+  border-radius: 8px;
+  max-width: 900px;
+  width: 95%;
+}
+
+h1 {
+  color: #333;
+  text-align: center;
+  margin-bottom: clamp(8px, 2.4vw, 13px);
+  font-size: clamp(1.8em, 5vw, 2.5em);
+}
+
+p {
+  color: #333;
+  text-align: center;
+  font-size: clamp(0.8em, 2vw, 1.2em);
+  margin-bottom: clamp(8px, 2.4vw, 13px);
+}
+
+/* Untuk components/TodoForm.js */
+form {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+input[type="text"] {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px 0 0 4px;
+  flex-grow: 1;
+  font-size: 1em;
+  outline: none;
+}
+
+button {
+  padding: 12px 15px;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Untuk components/TodoItem.js */
+ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+li:last-child {
+  border-bottom: none;
+}
+
+
+.view-container {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.view-container input[type="checkbox"] {
+  margin-right: 15px;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.view-container span {
+  flex-grow: 1;
+  font-size: 1em;
+  color: #555;
+}
+
+.view-container span.completed {
+  text-decoration: line-through;
+  color: #bbb;
+}
+
+.view-container .actions button {
+  background-color: transparent;
+  color: #007bff;
+  border: none;
+  padding: 5px 10px;
+  margin-left: 10px;
+  cursor: pointer;
+  font-size: 0.9em;
+  text-decoration: none;
+}
+
+.view-container .actions button:hover {
+  text-decoration: underline;
+}
+
+.view-container .actions .delete-button {
+  color: #dc3545;
+}
+
+.view-container .actions .delete-button:hover {
+  color: #c82333;
+  text-decoration: underline;
+}
+
+/* Container TodoList */
+ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+li:last-child {
+  border-bottom: none;
+}
+
+/* Container Edit */
+.edit-container {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.edit-container input[type="text"] {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  flex-grow: 1;
+  margin-right: 10px;
+  font-size: 1em;
+  outline: none;
+}
+
+.edit-container button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-size: 0.9em;
+  margin-left: 5px;
+}
+
+.edit-container .save-button {
+  background-color: #28a745;
+}
+
+.edit-container .save-button:hover {
+  background-color: #1e7e34;
+}
+
+.edit-container .cancel-button {
+  background-color: #ffc107;
+  color: #333;
+}
+
+.edit-container .cancel-button:hover {
+  background-color: #e0b300;
+}
+
+/* Container halaman login/register */
+.auth-container {
+  background-color: #fff;
+  padding: clamp(20px, 5vw, 30px);
+  border-radius: 8px;
+  max-width: 450px;
+  width: 100%;
+  text-align: center;
+}
+
+.auth-container h2 {
+  color: #333;
+  margin-bottom: clamp(15px, 4vw, 25px);
+  font-size: clamp(1.5em, 4vw, 1.8em);
+  text-align: center;
+}
+
+.auth-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.auth-container input[type="email"],
+.auth-container input[type="password"] {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1em;
+  outline: none;
+}
+
+.auth-container button[type="submit"] {
+  background-color: #28a745;
+  color: white;
+}
+
+.auth-container .google-button {
+  background-color: #f8f9fa;
+  color: #212529;
+  border: 1px solid #ddd;
+}
+
+.auth-container .guest-button {
+  background-color: #6c757d;
+  color: white;
+}
+
+.auth-container button[type="submit"],
+.auth-container .guest-button,
+.auth-container .google-button {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+  width: 100%;
+  /* Membuat tombol mengambil lebar penuh */
+}
+
+.auth-container button[type="submit"]:hover,
+.auth-container .guest-button:hover,
+.auth-container .google-button:hover {
+  opacity: 0.9;
+}
+
+.auth-container>a {
+  color: #007bff;
+  padding: 0;
+  cursor: pointer;
+  font-size: 0.9em;
+  margin-top: 15px;
+}
+
+.auth-container>a:hover {
+  color: #0056b3;
+}
+
+.auth-container button img {
+  margin-right: 10px;
+  width: 20px;
+  height: 20px;
+}
+
+.auth-container button span {
+  flex-grow: 1;
+  text-align: center;
+}
+
+/* Tampilan status dan error messages */
+.status-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.status-text,
+.error-message {
+  font-size: 0.9em;
+  color: #777;
+  text-align: center;
+}
+
+.status-link {
+  color: #dc3545;
+  text-decoration: none;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.status-link:hover {
+  text-decoration: underline;
+}
