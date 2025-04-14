@@ -61,9 +61,14 @@ const Auth = ({ onGuestSignIn }) => {
   const handleGoogleSignIn = async () => {
     setError('');
     try {
+      const redirectPath = process.env.REACT_APP_REDIRECT_PATH || '/';
+      const redirectUrl =
+        process.env.NODE_ENV === 'development'
+          ? 'http://localhost:3000'
+          : `${window.location.origin}${redirectPath}`;
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        redirectTo: `${window.location.origin}/todo-app`, // delete /todo.app if you deploy in root pages
+        redirectTo: redirectUrl,
       });
       if (error) throw error;
     } catch (err) {
@@ -71,7 +76,6 @@ const Auth = ({ onGuestSignIn }) => {
       setError('Failed to sign in with Google.');
     }
   };
-
   const handleGuestLogin = () => {
     localStorage.setItem('isGuest', 'true');
     if (onGuestSignIn) {

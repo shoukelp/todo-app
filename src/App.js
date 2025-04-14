@@ -6,8 +6,9 @@ import Auth from './components/Auth';
 import { useAuth } from './hooks/useAuth';
 import { getCookie, setCookie } from './utils/cookie';
 import './App.css';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 
-const App = () => {
+const MainApp = () => {
   const [todos, setTodos] = useState([]);
   const { user, signOut, supabase } = useAuth();
   const [isGuestMode, setIsGuestMode] = useState(false);
@@ -201,6 +202,31 @@ const App = () => {
         <Auth onGuestSignIn={handleGuestSignIn} />
       )}
     </div>
+  );
+};
+
+const AuthCallback = () => {
+  const { supabase } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const handleCallback = async () => {
+      await supabase.auth.getSession();
+      navigate('/');
+    };
+    handleCallback();
+  }, [supabase, navigate]);
+
+  return <p>Processing login, please wait...</p>;
+};
+
+const App = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<MainApp />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
+    </Routes>
   );
 };
 
