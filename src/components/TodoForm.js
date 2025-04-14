@@ -10,7 +10,7 @@ const TodoForm = ({ onAdd }) => {
         if (text.trim()) {
             onAdd(text);
             setText('');
-            setError(''); // Reset error
+            setError('');
         } else {
             setError('Todo cannot be empty.');
         }

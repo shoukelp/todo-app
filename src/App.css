@@ -213,6 +213,11 @@ li:last-child {
   text-align: center;
 }
 
+.auth-container p {
+  font-size: 0.9em;
+  color: #777;
+}
+
 .auth-container form {
   display: flex;
   flex-direction: column;
@@ -266,18 +271,6 @@ li:last-child {
   opacity: 0.9;
 }
 
-.auth-container>a {
-  color: #007bff;
-  padding: 0;
-  cursor: pointer;
-  font-size: 0.9em;
-  margin-top: 15px;
-}
-
-.auth-container>a:hover {
-  color: #0056b3;
-}
-
 .auth-container button img {
   margin-right: 10px;
   width: 20px;
@@ -287,6 +280,18 @@ li:last-child {
 .auth-container button span {
   flex-grow: 1;
   text-align: center;
+}
+
+.auth-toggle-link {
+  color: #007bff;
+  padding: 0;
+  cursor: pointer;
+  font-size: 0.9em;
+  margin-top: 20px;
+}
+
+.auth-toggle-link:hover {
+  color: #0056b3;
 }
 
 /* Tampilan status dan error messages */
@@ -310,7 +315,6 @@ li:last-child {
   color: #dc3545;
   text-decoration: none;
   cursor: pointer;
-  margin-left: 5px;
 }
 
 .status-link:hover {

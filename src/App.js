@@ -11,32 +11,51 @@ const App = () => {
   const [todos, setTodos] = useState([]);
   const { user, signOut, supabase } = useAuth();
   const [isGuestMode, setIsGuestMode] = useState(false);
+  const [status, setStatus] = useState('Loading application...');
   const GUEST_TODOS_KEY = 'guestTodos';
-  const [status, setStatus] = useState('Loading application...'); // Initial status
 
   useEffect(() => {
-    const storedGuestStatus = localStorage.getItem('isGuest');
-    if (!user && storedGuestStatus === 'true') {
-      setIsGuestMode(true);
-      loadGuestTodos();
-      setStatus('Guest Mode');
-    } else if (user) {
+    const storedGuest = localStorage.getItem('isGuest');
+    if (storedGuest === 'true') {
+      if (!user) {
+        setIsGuestMode(true);
+        loadGuestTodos();
+        setStatus('Guest Mode');
+        return;
+      }
+    }
+
+    if (user) {
+      setIsGuestMode(false);
+      localStorage.removeItem('isGuest');
       fetchTodosFromSupabase();
       setStatus(`Logged in as ${user.email}`);
-      setIsGuestMode(false);
-      localStorage.removeItem('isGuest');
     } else {
-      setStatus('Please log in or continue as Guest');
       setIsGuestMode(false);
-      localStorage.removeItem('isGuest');
+      setStatus('Please log in or continue as Guest');
     }
   }, [user]);
 
   const handleGuestSignIn = () => {
     setIsGuestMode(true);
-    loadGuestTodos();
     localStorage.setItem('isGuest', 'true');
+    loadGuestTodos();
     setStatus('Guest Mode');
+  };
+
+  const handleBackToLogin = () => {
+    setIsGuestMode(false);
+    localStorage.removeItem('isGuest');
+    setTodos([]);
+    setStatus('Back to login page');
+  };
+
+  const handleSignOut = () => {
+    signOut();
+    setIsGuestMode(false);
+    localStorage.removeItem('isGuest');
+    setTodos([]);
+    setStatus('Signed out successfully');
   };
 
   const loadGuestTodos = () => {
@@ -51,20 +70,17 @@ const App = () => {
   };
 
   const fetchTodosFromSupabase = async () => {
-    if (user) {
-      const { data, error } = await supabase
-        .from('todos')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+    const { data, error } = await supabase
+      .from('todos')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching todos:', error);
-        setStatus('Failed to load todos from server');
-      } else {
-        setTodos(data);
-        setStatus(`Logged in as ${user.email}`);
-      }
+    if (error) {
+      console.error('Error fetching todos:', error);
+      setStatus('Failed to load todos from server');
+    } else {
+      setTodos(data);
     }
   };
 
@@ -73,6 +89,7 @@ const App = () => {
       setStatus('Todo cannot be empty.');
       return;
     }
+
     if (user) {
       const { data, error } = await supabase
         .from('todos')
@@ -106,9 +123,10 @@ const App = () => {
         console.error('Error updating todo:', error);
         setStatus('Failed to update todo');
       } else {
-        setTodos(todos.map((todo) =>
+        const updatedTodos = todos.map((todo) =>
           todo.id === updatedTodo.id ? updatedTodo : todo
-        ));
+        );
+        setTodos(updatedTodos);
         setStatus('Todo updated successfully');
       }
     } else if (isGuestMode) {
@@ -143,25 +161,13 @@ const App = () => {
     }
   };
 
-  const handleSignOut = () => {
-    signOut();
-    setIsGuestMode(false);
-    localStorage.removeItem('isGuest');
-    setTodos([]);
-    setStatus('Signed out successfully');
-  };
-
-  const handleBackToLogin = () => {
-    setIsGuestMode(false);
-    setStatus('Back to login page');
-  };
-
   return (
     <div className="container">
       <h1>Tasky</h1>
       <p>A simple todo list web app created using create-react-app</p>
+
       {user || isGuestMode ? (
-        <div>
+        <>
           <TodoForm onAdd={addTodo} />
           <ul>
             {todos.map((todo) => (
@@ -178,19 +184,19 @@ const App = () => {
               {status}
               {user && (
                 <>
-                  <span> |</span>
+                  <span> | </span>
                   <a href="#" onClick={handleSignOut} className="status-link">Sign Out</a>
                 </>
               )}
               {isGuestMode && (
                 <>
-                  <span> |</span>
+                  <span> | </span>
                   <a href="#" onClick={handleBackToLogin} className="status-link">Back to Login</a>
                 </>
               )}
             </p>
           </div>
-        </div>
+        </>
       ) : (
         <Auth onGuestSignIn={handleGuestSignIn} />
       )}
