@@ -63,7 +63,7 @@ const Auth = ({ onGuestSignIn }) => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        redirectTo: window.location.origin,
+        redirectTo: `${window.location.origin}/todo-app`, // delete /todo.app if you deploy in root pages
       });
       if (error) throw error;
     } catch (err) {
