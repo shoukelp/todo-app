@@ -61,11 +61,10 @@ const Auth = ({ onGuestSignIn }) => {
   const handleGoogleSignIn = async () => {
     setError('');
     try {
-      const redirectPath = process.env.REACT_APP_REDIRECT_PATH || '/';
       const redirectUrl =
         process.env.NODE_ENV === 'development'
-          ? 'http://localhost:3000'
-          : `${window.location.origin}${redirectPath}`;
+          ? 'http://localhost:3000/todo-app'
+          : 'https://shoukelp.github.io/todo-app';
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         redirectTo: redirectUrl,

@@ -1,4 +1,5 @@
 /* App.css */
+
 * {
   padding: 0;
   margin: 0;
@@ -17,10 +18,12 @@ body {
 /* Container utama */
 .container {
   background-color: #fff;
-  padding: clamp(20px, 5vw, 40px);
+  padding: clamp(15px, 4vw, 25px);
   border-radius: 8px;
-  max-width: 900px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-width: 1100px;
   width: 95%;
+  margin: 0 auto;
 }
 
 h1 {
@@ -31,142 +34,183 @@ h1 {
 }
 
 p {
-  color: #333;
+  color: #555;
   text-align: center;
-  font-size: clamp(0.8em, 2vw, 1.2em);
-  margin-bottom: clamp(8px, 2.4vw, 13px);
+  font-size: clamp(0.8em, 2vw, 1.1em);
+  margin-bottom: clamp(15px, 3vw, 25px);
 }
 
-/* Untuk components/TodoForm.js */
-form {
+/* Styling untuk TodoForm */
+.todo-form {
   display: flex;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  gap: 10px;
 }
 
-input[type="text"] {
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px 0 0 4px;
+.todo-input {
+  padding: 12px 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
   flex-grow: 1;
   font-size: 1em;
   outline: none;
+  transition: border-color 0.2s ease-in-out;
+}
+.todo-input:focus {
+  border-color: #007bff;
 }
 
-button {
-  padding: 12px 15px;
+.priority-select {
+  padding: 0 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  font-size: 1em;
+  cursor: pointer;
+  outline: none;
+  height: 46px;
+  flex-shrink: 0;
+}
+
+.add-button {
+  padding: 12px 20px;
   border: none;
-  border-radius: 0 4px 4px 0;
+  border-radius: 4px;
   background-color: #007bff;
   color: white;
   cursor: pointer;
   font-size: 1em;
+  font-weight: 500;
   transition: background-color 0.3s ease;
+  flex-shrink: 0;
 }
 
-button:hover {
+.add-button:hover {
   background-color: #0056b3;
 }
 
-/* Untuk components/TodoItem.js */
+/* Styling untuk TodoList (ul) */
 ul {
   list-style: none;
   padding: 0;
   margin-top: 20px;
 }
 
-li {
+/* Styling untuk TodoItem (li) */
+li.todo-item-li {
   display: flex;
   align-items: center;
-  padding: 10px 0;
+  padding: 12px 10px;
   border-bottom: 1px solid #eee;
+  gap: 10px;
 }
 
 li:last-child {
   border-bottom: none;
 }
 
-
+/* Container view */
 .view-container {
   display: flex;
   align-items: center;
   flex-grow: 1;
+  gap: 10px;
+  overflow: hidden;
 }
 
+/* Checkbox */
 .view-container input[type="checkbox"] {
-  margin-right: 15px;
+  margin: 0;
   width: 18px;
   height: 18px;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
-.view-container span {
+/* Styling Icon Prioritas */
+.priority-icon {
+  font-size: 1.1em;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.priority-icon.priority-high { color: #dc3545; }
+.priority-icon.priority-medium { color: #ffc107; }
+.priority-icon.priority-low { color: #28a745; }
+.priority-icon { color: #ccc; }  /* Warna default jika tidak ada prioritas */
+
+/* Wrapper untuk Teks dan Tanggal */
+.text-date-wrapper {
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
+  gap: 3px;
+  overflow: hidden;
+}
+
+/* Styling Teks Todo */
+.todo-text {
   font-size: 1em;
-  color: #555;
+  color: #333;
+  word-break: break-word;
+  line-height: 1.4;
 }
 
-.view-container span.completed {
+.todo-text.completed {
   text-decoration: line-through;
-  color: #bbb;
+  color: #aaa;
+  font-style: italic;
 }
 
-.view-container .actions button {
+/* Styling Tanggal */
+.todo-date {
+  font-size: 0.75em;
+  color: #777;
+  line-height: 1;
+}
+
+/* Styling Tombol Actions (Edit, Delete) */
+.actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.actions button {
   background-color: transparent;
-  color: #007bff;
   border: none;
-  padding: 5px 10px;
-  margin-left: 10px;
+  padding: 5px 8px;
+  margin-left: 8px;
   cursor: pointer;
   font-size: 0.9em;
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
-.view-container .actions button:hover {
-  text-decoration: underline;
-}
+.actions .edit-button { color: #007bff; }
+.actions .edit-button:hover { color: #0056b3; text-decoration: underline; }
+.actions .delete-button { color: #dc3545; }
+.actions .delete-button:hover { color: #c82333; text-decoration: underline; }
 
-.view-container .actions .delete-button {
-  color: #dc3545;
-}
-
-.view-container .actions .delete-button:hover {
-  color: #c82333;
-  text-decoration: underline;
-}
-
-/* Container TodoList */
-ul {
-  list-style: none;
-  padding: 0;
-  margin-top: 20px;
-}
-
-li {
-  display: flex;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
-}
-
-li:last-child {
-  border-bottom: none;
-}
-
-/* Container Edit */
+/* Styling container edit mode */
 .edit-container {
   display: flex;
   align-items: center;
   flex-grow: 1;
+  gap: 10px;
 }
 
 .edit-container input[type="text"] {
   padding: 10px;
-  border: 1px solid #ddd;
+  border: 1px solid #ccc;
   border-radius: 4px;
   flex-grow: 1;
-  margin-right: 10px;
   font-size: 1em;
   outline: none;
+}
+.edit-container input[type="text"]:focus {
+  border-color: #007bff;
 }
 
 .edit-container button {
@@ -176,46 +220,37 @@ li:last-child {
   color: white;
   cursor: pointer;
   font-size: 0.9em;
-  margin-left: 5px;
+  flex-shrink: 0;
+  transition: background-color 0.3s ease;
 }
 
-.edit-container .save-button {
-  background-color: #28a745;
-}
+.edit-container .save-button { background-color: #28a745; }
+.edit-container .save-button:hover { background-color: #1e7e34; }
+.edit-container .cancel-button { background-color: #6c757d; }
+.edit-container .cancel-button:hover { background-color: #5a6268; }
 
-.edit-container .save-button:hover {
-  background-color: #1e7e34;
-}
 
-.edit-container .cancel-button {
-  background-color: #ffc107;
-  color: #333;
-}
-
-.edit-container .cancel-button:hover {
-  background-color: #e0b300;
-}
-
-/* Container halaman login/register */
+/* Container halaman login/register (Auth.js) */
 .auth-container {
   background-color: #fff;
-  padding: clamp(20px, 5vw, 30px);
+  padding: clamp(25px, 5vw, 40px);
   border-radius: 8px;
   max-width: 450px;
   width: 100%;
   text-align: center;
+  margin: 30px auto;
 }
 
 .auth-container h2 {
   color: #333;
-  margin-bottom: clamp(15px, 4vw, 25px);
-  font-size: clamp(1.5em, 4vw, 1.8em);
-  text-align: center;
+  margin-bottom: clamp(20px, 4vw, 30px);
+  font-size: clamp(1.6em, 4vw, 2em);
 }
 
 .auth-container p {
-  font-size: 0.9em;
-  color: #777;
+  font-size: 0.95em;
+  color: #666;
+  margin-bottom: 20px;
 }
 
 .auth-container form {
@@ -227,54 +262,38 @@ li:last-child {
 
 .auth-container input[type="email"],
 .auth-container input[type="password"] {
-  padding: 12px;
-  border: 1px solid #ddd;
+  padding: 14px;
+  border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 1em;
   outline: none;
+  transition: border-color 0.2s ease-in-out;
+}
+.auth-container input[type="email"]:focus,
+.auth-container input[type="password"]:focus {
+  border-color: #007bff;
 }
 
-.auth-container button[type="submit"] {
-  background-color: #28a745;
-  color: white;
-}
-
-.auth-container .google-button {
-  background-color: #f8f9fa;
-  color: #212529;
-  border: 1px solid #ddd;
-}
-
-.auth-container .guest-button {
-  background-color: #6c757d;
-  color: white;
-}
-
-.auth-container button[type="submit"],
-.auth-container .guest-button,
-.auth-container .google-button {
+/* Tombol umum dalam Auth container */
+.auth-container button {
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 12px 15px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 1em;
-  transition: background-color 0.3s ease;
-  margin-top: 10px;
+  font-weight: 500;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  border: 1px solid transparent;
   width: 100%;
-  /* Membuat tombol mengambil lebar penuh */
-}
-
-.auth-container button[type="submit"]:hover,
-.auth-container .guest-button:hover,
-.auth-container .google-button:hover {
-  opacity: 0.9;
+  gap: 10px;
 }
 
 .auth-container button img {
-  margin-right: 10px;
   width: 20px;
   height: 20px;
+  flex-shrink: 0;
 }
 
 .auth-container button span {
@@ -282,14 +301,38 @@ li:last-child {
   text-align: center;
 }
 
+/* Styling spesifik tombol Auth */
+.auth-container button[type="submit"] {
+  background-color: #28a745;
+  color: white;
+  border-color: #28a745;
+}
+.auth-container button[type="submit"]:hover { background-color: #218838; border-color: #1e7e34;}
+
+.auth-container .google-button {
+  background-color: #fff;
+  color: #444;
+  border: 1px solid #ccc;
+}
+.auth-container .google-button:hover { background-color: #f8f8f8; border-color: #bbb;}
+
+.auth-container .guest-button {
+  background-color: #6c757d;
+  color: white;
+  border-color: #6c757d;
+}
+.auth-container .guest-button:hover { background-color: #5a6268; border-color: #545b62; }
+
+/* Link toggle Sign In / Sign Up */
 .auth-toggle-link {
   color: #007bff;
+  background: none;
+  border: none;
   padding: 0;
   cursor: pointer;
   font-size: 0.9em;
-  margin-top: 20px;
+  text-decoration: underline;
 }
-
 .auth-toggle-link:hover {
   color: #0056b3;
 }
@@ -299,24 +342,48 @@ li:last-child {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
-  flex-direction: column;
-  gap: 5px;
+  margin-top: 25px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+  min-height: 40px;
 }
 
 .status-text,
 .error-message {
   font-size: 0.9em;
-  color: #777;
+  color: #555;
+  text-align: center;
+  margin: 0;
+}
+
+/* Error message styling (jika ada elemen khusus .error-message) */
+.error-message {
+  color: #dc3545;
+  font-weight: 500;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  width: 100%;
   text-align: center;
 }
 
 .status-link {
-  color: #dc3545;
+  color: #007bff;
   text-decoration: none;
   cursor: pointer;
+  font-weight: 500;
 }
 
 .status-link:hover {
   text-decoration: underline;
+}
+
+/* Pemisah di status area */
+.status-area span {
+  color: #ccc;
+  margin: 0;
 }

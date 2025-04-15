@@ -20,6 +20,46 @@ Aplikasi todo list ini memungkinkan Anda untuk:
 - **Melanjutkan Sebagai Tamu**
 - **Sign Up/Sign In dengan Email dan Password**
 
+## Struktur
+```
+.
+└── /
+    ├── docs/
+    │   ├── flowchart.png
+    │   └── tables.png
+    ├── public/
+    │   ├── favicon.ico
+    │   ├── index.html
+    │   ├── logo.png
+    │   ├── logo192.png
+    │   ├── logo512.png
+    │   ├── manifest.json
+    │   └── robots.txt
+    ├── src/
+    │   ├── assets/
+    │   │   └── icons/
+    │   │       ├── auth-icon.svg
+    │   │       ├── google-icon.svg
+    │   │       └── guest-icon.svg
+    │   ├── components/
+    │   │   ├── Auth.js
+    │   │   ├── constants.js
+    │   │   ├── TodoForm.js
+    │   │   └── TodoItem.js
+    │   ├── hooks/
+    │   │   └── useAuth.js
+    │   ├── utils/
+    │   │   └── cookie.js
+    │   ├── App.css
+    │   ├── App.js
+    │   └── index.js
+    ├── .env
+    ├── .gitignore
+    ├── LICENSE
+    ├── package.json
+    └── README.md
+```
+
 ## Instalasi dan Penggunaan Pribadi
 
 Berikut adalah langkah-langkah untuk menjalankan aplikasi ini di lokal dan menghubungkannya dengan Supabase serta Google OAuth.
