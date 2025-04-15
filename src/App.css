@@ -1,4 +1,4 @@
-/* App.css */
+/* App.css - Main Stylesheet */
 
 * {
   padding: 0;
@@ -13,16 +13,17 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  padding: 15px;
 }
 
-/* Container utama */
+/* Main application container */
 .container {
   background-color: #fff;
   padding: clamp(15px, 4vw, 25px);
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   max-width: 1100px;
-  width: 95%;
+  width: 100%;
   margin: 0 auto;
 }
 
@@ -40,9 +41,13 @@ p {
   margin-bottom: clamp(15px, 3vw, 25px);
 }
 
-/* Styling untuk TodoForm */
+/* TodoForm Styling */
 .todo-form {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
   margin-bottom: 25px;
   gap: 10px;
 }
@@ -55,7 +60,9 @@ p {
   font-size: 1em;
   outline: none;
   transition: border-color 0.2s ease-in-out;
+  min-width: 200px;
 }
+
 .todo-input:focus {
   border-color: #007bff;
 }
@@ -83,42 +90,44 @@ p {
   font-weight: 500;
   transition: background-color 0.3s ease;
   flex-shrink: 0;
+  height: 46px;
 }
 
 .add-button:hover {
   background-color: #0056b3;
 }
 
-/* Styling untuk TodoList (ul) */
+/* TodoList (ul) Styling */
 ul {
   list-style: none;
   padding: 0;
   margin-top: 20px;
 }
 
-/* Styling untuk TodoItem (li) */
+/* TodoItem (li) Styling */
 li.todo-item-li {
   display: flex;
   align-items: center;
   padding: 12px 10px;
   border-bottom: 1px solid #eee;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 li:last-child {
   border-bottom: none;
 }
 
-/* Container view */
+/* TodoItem View Mode Container */
 .view-container {
   display: flex;
   align-items: center;
   flex-grow: 1;
   gap: 10px;
   overflow: hidden;
+  width: 100%;
 }
 
-/* Checkbox */
 .view-container input[type="checkbox"] {
   margin: 0;
   width: 18px;
@@ -127,7 +136,7 @@ li:last-child {
   flex-shrink: 0;
 }
 
-/* Styling Icon Prioritas */
+/* Priority Icon Styling */
 .priority-icon {
   font-size: 1.1em;
   flex-shrink: 0;
@@ -137,23 +146,27 @@ li:last-child {
 .priority-icon.priority-high { color: #dc3545; }
 .priority-icon.priority-medium { color: #ffc107; }
 .priority-icon.priority-low { color: #28a745; }
-.priority-icon { color: #ccc; }  /* Warna default jika tidak ada prioritas */
+.priority-icon { color: #ccc; } /* Default color if no priority */
 
-/* Wrapper untuk Teks dan Tanggal */
+/* Wrapper for Todo Text and Date */
 .text-date-wrapper {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
   gap: 3px;
   overflow: hidden;
+  min-width: 0; /* Important for flex-grow behavior */
 }
 
-/* Styling Teks Todo */
+/* Todo Text Styling */
 .todo-text {
   font-size: 1em;
   color: #333;
   word-break: break-word;
   line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .todo-text.completed {
@@ -162,19 +175,18 @@ li:last-child {
   font-style: italic;
 }
 
-/* Styling Tanggal */
+/* Todo Date Styling */
 .todo-date {
   font-size: 0.75em;
   color: #777;
   line-height: 1;
 }
 
-/* Styling Tombol Actions (Edit, Delete) */
+/* Action Buttons (Edit, Delete) Styling */
 .actions {
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  margin-left: auto;
 }
 
 .actions button {
@@ -186,6 +198,7 @@ li:last-child {
   font-size: 0.9em;
   text-decoration: none;
   transition: color 0.2s ease;
+  white-space: nowrap;
 }
 
 .actions .edit-button { color: #007bff; }
@@ -193,24 +206,40 @@ li:last-child {
 .actions .delete-button { color: #dc3545; }
 .actions .delete-button:hover { color: #c82333; text-decoration: underline; }
 
-/* Styling container edit mode */
+/* TodoItem Edit Mode Container Styling */
 .edit-container {
   display: flex;
   align-items: center;
   flex-grow: 1;
   gap: 10px;
+  width: 100%;
+  flex-wrap: wrap;
 }
 
-.edit-container input[type="text"] {
+.edit-container input[type="text"].edit-todo-input {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
   flex-grow: 1;
   font-size: 1em;
   outline: none;
+  min-width: 150px;
 }
-.edit-container input[type="text"]:focus {
+
+.edit-container input[type="text"].edit-todo-input:focus {
   border-color: #007bff;
+}
+
+.edit-container select.edit-priority-select {
+  padding: 0 10px;
+  height: 38px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  font-size: 0.9em;
+  cursor: pointer;
+  outline: none;
+  flex-shrink: 0;
 }
 
 .edit-container button {
@@ -230,11 +259,10 @@ li:last-child {
 .edit-container .cancel-button:hover { background-color: #5a6268; }
 
 
-/* Container halaman login/register (Auth.js) */
+/* --- Auth Component Styling --- */
 .auth-container {
   background-color: #fff;
   padding: clamp(25px, 5vw, 40px);
-  border-radius: 8px;
   max-width: 450px;
   width: 100%;
   text-align: center;
@@ -253,6 +281,10 @@ li:last-child {
   margin-bottom: 20px;
 }
 
+.auth-container p:last-of-type {
+  margin-bottom: 0; /* Reduce margin for the toggle text */
+}
+
 .auth-container form {
   display: flex;
   flex-direction: column;
@@ -269,16 +301,16 @@ li:last-child {
   outline: none;
   transition: border-color 0.2s ease-in-out;
 }
+
 .auth-container input[type="email"]:focus,
 .auth-container input[type="password"]:focus {
   border-color: #007bff;
 }
 
-/* Tombol umum dalam Auth container */
+/* General Auth Button Styling (Icon left, Text centered) */
 .auth-container button {
   display: flex;
   align-items: center;
-  justify-content: center;
   padding: 12px 15px;
   border-radius: 4px;
   cursor: pointer;
@@ -287,21 +319,23 @@ li:last-child {
   transition: background-color 0.3s ease, border-color 0.3s ease;
   border: 1px solid transparent;
   width: 100%;
-  gap: 10px;
+  overflow: hidden;
 }
 
 .auth-container button img {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
+  margin-right: 10px; /* Space between icon and text */
 }
 
 .auth-container button span {
-  flex-grow: 1;
-  text-align: center;
+  flex-grow: 1; /* Take remaining space */
+  text-align: center; /* Center text within the span */
+  white-space: nowrap;
 }
 
-/* Styling spesifik tombol Auth */
+/* Specific Auth Button Styles */
 .auth-container button[type="submit"] {
   background-color: #28a745;
   color: white;
@@ -323,7 +357,7 @@ li:last-child {
 }
 .auth-container .guest-button:hover { background-color: #5a6268; border-color: #545b62; }
 
-/* Link toggle Sign In / Sign Up */
+/* Auth Toggle Link Styling */
 .auth-toggle-link {
   color: #007bff;
   background: none;
@@ -337,7 +371,10 @@ li:last-child {
   color: #0056b3;
 }
 
-/* Tampilan status dan error messages */
+/* --- End Auth Component Styling --- */
+
+
+/* Status Area & Error Message Styling */
 .status-area {
   display: flex;
   justify-content: center;
@@ -350,23 +387,23 @@ li:last-child {
   min-height: 40px;
 }
 
-.status-text,
-.error-message {
+.status-text { /* Also applies to error messages if only <p> is used */
   font-size: 0.9em;
   color: #555;
   text-align: center;
   margin: 0;
 }
 
-/* Error message styling (jika ada elemen khusus .error-message) */
+/* Specific Error Message Styling */
 .error-message {
+  font-size: 0.9em; /* Ensure consistency */
   color: #dc3545;
   font-weight: 500;
   background-color: #f8d7da;
   border: 1px solid #f5c6cb;
   padding: 10px 15px;
   border-radius: 4px;
-  margin-bottom: 15px;
+  margin-bottom: 15px; /* Space below error message */
   width: 100%;
   text-align: center;
 }
@@ -382,8 +419,43 @@ li:last-child {
   text-decoration: underline;
 }
 
-/* Pemisah di status area */
+/* Status Area Separator (|) */
 .status-area span {
   color: #ccc;
-  margin: 0;
+  margin: 0 5px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+  .todo-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .edit-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .edit-container input[type="text"].edit-todo-input,
+  .edit-container select.edit-priority-select,
+  .edit-container button {
+    width: 100%;
+  }
+
+  .view-container {
+    flex-wrap: wrap;
+  }
+
+  .actions {
+    margin-left: 0;
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 5px;
+  }
+
+  .text-date-wrapper {
+    /* Adjust max-width if text consistently overflows on small screens */
+    max-width: calc(100% - 80px); /* Example: Adjust based on checkbox/icon/button widths */
+  }
 }

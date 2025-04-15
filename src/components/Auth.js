@@ -5,80 +5,127 @@ import googleIcon from '../assets/icons/google-icon.svg';
 import guestIcon from '../assets/icons/guest-icon.svg';
 import authIcon from '../assets/icons/auth-icon.svg';
 
+// Auth component handles Sign Up, Sign In, Google OAuth, and Guest login
 const Auth = ({ onGuestSignIn }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { signUp, signIn, supabase } = useAuth();
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
+  // Basic email format validation
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
+    return re.test(String(email).toLowerCase());
   };
 
+  // Handles submission for email/password Sign Up or Sign In
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
+    // Input Validations
     if (!email || !password) {
-      setError('Email or password must not be empty');
+      setError('Email and password must not be empty.');
+      setLoading(false);
       return;
     }
-
     if (!validateEmail(email)) {
       setError('Email format is invalid.');
+      setLoading(false);
       return;
     }
-
     if (password.length < 8) {
       setError('Password must be at least 8 characters.');
+      setLoading(false);
       return;
     }
 
     try {
+      let authResponse;
       if (isSignUp) {
-        const { error: signUpError } = await signUp(email, password);
-        if (signUpError) {
-          if (signUpError.message.includes('User already registered')) {
-            setError('Email already registered.');
-          } else {
-            setError('Sign up failed: ' + signUpError.message);
-          }
+        // Sign Up attempt
+        authResponse = await signUp(email, password);
+        if (authResponse.error) {
+           // Handle specific Sign Up errors from Supabase
+           if (authResponse.error.message.includes('User already registered')) {
+             setError('Email already registered. Please Sign In.');
+           } else if (authResponse.error.message.includes('Email rate limit exceeded')) {
+              setError('Too many sign up attempts. Please try again later.');
+           } else {
+             setError(`Sign up failed: ${authResponse.error.message}`);
+           }
+        } else {
+           // Successful Sign Up (actual user state update happens via onAuthStateChange listener)
+           console.log('Sign up successful', authResponse); // Optional success log
         }
       } else {
-        const { error: signInError } = await signIn(email, password);
-        if (signInError) {
-          setError('Incorrect email or password.');
+        // Sign In attempt
+        authResponse = await signIn(email, password);
+        if (authResponse.error) {
+          // Handle specific Sign In errors from Supabase
+          if (authResponse.error.message.includes('Invalid login credentials')) {
+             setError('Incorrect email or password.');
+          } else if (authResponse.error.message.includes('Email not confirmed')) {
+             setError('Please confirm your email address first.');
+          } else {
+            setError(`Sign in failed: ${authResponse.error.message}`);
+          }
+        } else {
+          // Successful Sign In (actual user state update happens via onAuthStateChange listener)
+          console.log('Sign in successful', authResponse); // Optional success log
         }
       }
     } catch (err) {
-      console.error('Auth error:', err);
-      setError('An error occurred while signing in/up.');
+      console.error('Auth error during email/password submission:', err);
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
+       setLoading(false); // Ensure loading is stopped
     }
   };
 
+  // Handles the initiation of the Google OAuth Sign-in flow
   const handleGoogleSignIn = async () => {
     setError('');
+    setLoading(true);
     try {
+      // Define redirect URLs based on the environment (development vs. production)
       const redirectUrl =
         process.env.NODE_ENV === 'development'
-          ? 'http://localhost:3000/todo-app'
-          : 'https://shoukelp.github.io/todo-app';
-      const { error } = await supabase.auth.signInWithOAuth({
+          ? 'http://localhost:3000/' // Adjust port if necessary for local dev
+          : 'https://shoukelp.github.io/todo-app/'; // Production URL on GitHub Pages
+
+      // console.log('Attempting Google Sign in with redirect to:', redirectUrl); // Optional debug log
+
+      // Call Supabase OAuth function
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        redirectTo: redirectUrl,
+        options: {
+          redirectTo: redirectUrl,
+          // scopes: '...', // Add additional Google scopes if needed
+        },
       });
-      if (error) throw error;
+
+      // Catch errors that might occur before the user is redirected to Google
+      if (oauthError) {
+        throw oauthError;
+      }
+      // If successful, the browser navigates away, so loading state remains true until page reloads
+
     } catch (err) {
-      console.error('Google sign-in error:', err);
-      setError('Failed to sign in with Google.');
+      console.error('Google sign-in initiation error:', err);
+      setError(`Failed to initiate Google Sign in: ${err.message || 'Unknown error'}`);
+      setLoading(false); // Stop loading only if an error happens *before* redirect
     }
   };
+
+  // Handles the "Continue as Guest" button click
   const handleGuestLogin = () => {
-    localStorage.setItem('isGuest', 'true');
+    localStorage.setItem('isGuest', 'true'); // Set flag in local storage
     if (onGuestSignIn) {
-      onGuestSignIn();
+      onGuestSignIn(); // Notify parent component (App.js) to update state
     }
   };
 
@@ -86,6 +133,7 @@ const Auth = ({ onGuestSignIn }) => {
     <div className="auth-container">
       <h2>{isSignUp ? 'Sign Up' : 'Sign In'}</h2>
       {error && <p className="error-message">{error}</p>}
+
       <form onSubmit={handleSubmit}>
         <input
           type="email"
@@ -93,39 +141,51 @@ const Auth = ({ onGuestSignIn }) => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           autoComplete="email"
+          disabled={loading} // Disable inputs during auth operations
         />
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
+          autoComplete={isSignUp ? "new-password" : "current-password"}
+          disabled={loading}
         />
-        <button type="submit">
-          <img src={authIcon} alt="Auth Icon" style={{ marginRight: '10px' }} />
-          {isSignUp ? 'Sign Up' : 'Sign In'}
+
+        {/* Authentication Buttons */}
+        <button type="submit" disabled={loading}>
+          <img src={authIcon} alt="" /> {/* Alt can be empty for decorative icons */}
+          <span>{loading ? (isSignUp ? 'Signing Up...' : 'Signing In...') : (isSignUp ? 'Sign Up' : 'Sign In')}</span>
         </button>
-        <button type="button" onClick={handleGoogleSignIn} className="google-button">
-          <img src={googleIcon} alt="Google Icon" style={{ marginRight: '10px' }} />
-          Login with Google
+
+        <button type="button" onClick={handleGoogleSignIn} className="google-button" disabled={loading}>
+          <img src={googleIcon} alt="" />
+          <span>{loading ? 'Redirecting...' : 'Login with Google'}</span>
         </button>
-        <button type="button" onClick={handleGuestLogin} className="guest-button">
-          <img src={guestIcon} alt="Guest Icon" style={{ marginRight: '10px' }} />
-          Continue as Guest
+
+        <button type="button" onClick={handleGuestLogin} className="guest-button" disabled={loading}>
+          <img src={guestIcon} alt="" />
+          <span>Continue as Guest</span>
         </button>
       </form>
-      <p style={{ marginTop: '10px' }}>
-      {isSignUp ? (
-        <>
+
+      {/* Toggle between Sign In and Sign Up views */}
+      <p>
+        {isSignUp ? (
+          <>
             Already have an account?{' '}
-            <span className="auth-toggle-link" onClick={() => setIsSignUp(false)}>Sign In</span>
-        </>
+            <span className="auth-toggle-link" onClick={() => !loading && setIsSignUp(false)}>
+              Sign In
+            </span>
+          </>
         ) : (
-        <>
+          <>
             Don't have an account?{' '}
-            <span className="auth-toggle-link" onClick={() => setIsSignUp(true)}>Sign Up</span>
-        </>
-      )}
+            <span className="auth-toggle-link" onClick={() => !loading && setIsSignUp(true)}>
+              Sign Up
+            </span>
+          </>
+        )}
       </p>
     </div>
   );
