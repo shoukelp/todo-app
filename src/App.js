@@ -356,6 +356,7 @@ const MainApp = () => {
           </div>
         </>
       )}
+    <div className='footer'>Copyright &copy; 2025 shoukelp</div>
     </div>
   );
 };

@@ -425,6 +425,12 @@ li:last-child {
   margin: 0 5px;
 }
 
+.footer {
+  color: #555;
+  text-align: center;
+  margin-top: 25px;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 600px) {
   .todo-form {
