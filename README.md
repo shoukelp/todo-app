@@ -100,27 +100,48 @@ yarn install
 2. Jalankan SQL berikut di SQL Editor:
 
 ```sql
-CREATE TABLE todos (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id TEXT REFERENCES auth.users(id),
-  text TEXT NOT NULL,
-  is_completed BOOLEAN NOT NULL DEFAULT FALSE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+CREATE TABLE IF NOT EXISTS public.todos (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    text TEXT NOT NULL CHECK (char_length(text) > 0),
+    completed BOOLEAN NOT NULL DEFAULT FALSE,
+    priority TEXT NOT NULL DEFAULT 'Medium' CHECK (priority IN ('High', 'Medium', 'Low')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
-ALTER TABLE todos ENABLE ROW LEVEL SECURITY;
+CREATE INDEX IF NOT EXISTS todos_user_id_idx ON public.todos (user_id);
+CREATE INDEX IF NOT EXISTS todos_priority_idx ON public.todos (priority);
 
-CREATE POLICY "Allow users to insert their own todos." ON todos
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
+ALTER TABLE public.todos ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Allow users to select their own todos." ON todos
-  FOR SELECT TO authenticated USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Allow individual read access" ON public.todos;
+CREATE POLICY "Allow individual read access"
+ON public.todos
+FOR SELECT
+TO authenticated
+USING (auth.uid() = user_id);
 
-CREATE POLICY "Allow users to update their own todos." ON todos
-  FOR UPDATE WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Allow individual insert access" ON public.todos;
+CREATE POLICY "Allow individual insert access"
+ON public.todos
+FOR INSERT
+TO authenticated
+WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Allow users to delete their own todos." ON todos
-  FOR DELETE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Allow individual update access" ON public.todos;
+CREATE POLICY "Allow individual update access"
+ON public.todos
+FOR UPDATE
+TO authenticated
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Allow individual delete access" ON public.todos;
+CREATE POLICY "Allow individual delete access"
+ON public.todos
+FOR DELETE
+TO authenticated
+USING (auth.uid() = user_id);
 ```
 
 ---
