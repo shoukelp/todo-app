@@ -22,7 +22,7 @@ body {
   padding: clamp(15px, 4vw, 25px);
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  max-width: 1100px;
+  max-width: 800px;
   width: 100%;
   margin: 0 auto;
 }
@@ -47,7 +47,6 @@ p {
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  padding: 10px;
   margin-bottom: 25px;
   gap: 10px;
 }
@@ -143,10 +142,23 @@ li:last-child {
   line-height: 1;
 }
 
-.priority-icon.priority-high { color: #dc3545; }
-.priority-icon.priority-medium { color: #ffc107; }
-.priority-icon.priority-low { color: #28a745; }
-.priority-icon { color: #ccc; } /* Default color if no priority */
+.priority-icon.priority-high {
+  color: #dc3545;
+}
+
+.priority-icon.priority-medium {
+  color: #ffc107;
+}
+
+.priority-icon.priority-low {
+  color: #28a745;
+}
+
+.priority-icon {
+  color: #ccc;
+}
+
+/* Default color if no priority */
 
 /* Wrapper for Todo Text and Date */
 .text-date-wrapper {
@@ -155,7 +167,8 @@ li:last-child {
   flex-grow: 1;
   gap: 3px;
   overflow: hidden;
-  min-width: 0; /* Important for flex-grow behavior */
+  min-width: 0;
+  /* Important for flex-grow behavior */
 }
 
 /* Todo Text Styling */
@@ -172,7 +185,8 @@ li:last-child {
 .todo-text.completed {
   text-decoration: line-through;
   color: #aaa;
-  font-style: italic;
+  font-style: oblique;
+  margin: auto 2px;
 }
 
 /* Todo Date Styling */
@@ -201,10 +215,23 @@ li:last-child {
   white-space: nowrap;
 }
 
-.actions .edit-button { color: #007bff; }
-.actions .edit-button:hover { color: #0056b3; text-decoration: underline; }
-.actions .delete-button { color: #dc3545; }
-.actions .delete-button:hover { color: #c82333; text-decoration: underline; }
+.actions .edit-button {
+  color: #007bff;
+}
+
+.actions .edit-button:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.actions .delete-button {
+  color: #dc3545;
+}
+
+.actions .delete-button:hover {
+  color: #c82333;
+  text-decoration: underline;
+}
 
 /* TodoItem Edit Mode Container Styling */
 .edit-container {
@@ -253,10 +280,21 @@ li:last-child {
   transition: background-color 0.3s ease;
 }
 
-.edit-container .save-button { background-color: #28a745; }
-.edit-container .save-button:hover { background-color: #1e7e34; }
-.edit-container .cancel-button { background-color: #6c757d; }
-.edit-container .cancel-button:hover { background-color: #5a6268; }
+.edit-container .save-button {
+  background-color: #28a745;
+}
+
+.edit-container .save-button:hover {
+  background-color: #1e7e34;
+}
+
+.edit-container .cancel-button {
+  background-color: #6c757d;
+}
+
+.edit-container .cancel-button:hover {
+  background-color: #5a6268;
+}
 
 
 /* --- Auth Component Styling --- */
@@ -282,7 +320,7 @@ li:last-child {
 }
 
 .auth-container p:last-of-type {
-  margin-bottom: 0; /* Reduce margin for the toggle text */
+  margin-bottom: 0;
 }
 
 .auth-container form {
@@ -326,12 +364,12 @@ li:last-child {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
-  margin-right: 10px; /* Space between icon and text */
+  margin-right: 10px;
 }
 
 .auth-container button span {
-  flex-grow: 1; /* Take remaining space */
-  text-align: center; /* Center text within the span */
+  flex-grow: 1;
+  text-align: center;
   white-space: nowrap;
 }
 
@@ -341,21 +379,33 @@ li:last-child {
   color: white;
   border-color: #28a745;
 }
-.auth-container button[type="submit"]:hover { background-color: #218838; border-color: #1e7e34;}
+
+.auth-container button[type="submit"]:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
 
 .auth-container .google-button {
   background-color: #fff;
   color: #444;
   border: 1px solid #ccc;
 }
-.auth-container .google-button:hover { background-color: #f8f8f8; border-color: #bbb;}
+
+.auth-container .google-button:hover {
+  background-color: #f8f8f8;
+  border-color: #bbb;
+}
 
 .auth-container .guest-button {
   background-color: #6c757d;
   color: white;
   border-color: #6c757d;
 }
-.auth-container .guest-button:hover { background-color: #5a6268; border-color: #545b62; }
+
+.auth-container .guest-button:hover {
+  background-color: #5a6268;
+  border-color: #545b62;
+}
 
 /* Auth Toggle Link Styling */
 .auth-toggle-link {
@@ -367,12 +417,10 @@ li:last-child {
   font-size: 0.9em;
   text-decoration: underline;
 }
+
 .auth-toggle-link:hover {
   color: #0056b3;
 }
-
-/* --- End Auth Component Styling --- */
-
 
 /* Status Area & Error Message Styling */
 .status-area {
@@ -387,7 +435,8 @@ li:last-child {
   min-height: 40px;
 }
 
-.status-text { /* Also applies to error messages if only <p> is used */
+.status-text {
+  /* Also applies to error messages if only <p> is used */
   font-size: 0.9em;
   color: #555;
   text-align: center;
@@ -396,14 +445,16 @@ li:last-child {
 
 /* Specific Error Message Styling */
 .error-message {
-  font-size: 0.9em; /* Ensure consistency */
+  font-size: 0.9em;
+  /* Ensure consistency */
   color: #dc3545;
   font-weight: 500;
   background-color: #f8d7da;
   border: 1px solid #f5c6cb;
   padding: 10px 15px;
   border-radius: 4px;
-  margin-bottom: 15px; /* Space below error message */
+  margin-bottom: 15px;
+  /* Space below error message */
   width: 100%;
   text-align: center;
 }
@@ -432,7 +483,11 @@ li:last-child {
 }
 
 /* Responsive Adjustments */
-@media (max-width: 600px) {
+@media (max-width: 720px) {
+  .container {
+    max-width: 400px;
+  }
+
   .todo-form {
     flex-direction: column;
     align-items: stretch;
@@ -462,6 +517,7 @@ li:last-child {
 
   .text-date-wrapper {
     /* Adjust max-width if text consistently overflows on small screens */
-    max-width: calc(100% - 80px); /* Example: Adjust based on checkbox/icon/button widths */
+    max-width: calc(100% - 80px);
+    /* Example: Adjust based on checkbox/icon/button widths */
   }
 }
