@@ -28,7 +28,8 @@ const FilterControls = ({ filter, setFilter, sortBy, setSortBy }) => {
           <option value="date-asc">Date (Oldest First)</option>
           <option value="alpha-asc">Alphabetical (A-Z)</option>
           <option value="alpha-desc">Alphabetical (Z-A)</option>
-          { }
+          <option value="priority-desc">Priority (High to Low)</option>
+          <option value="priority-asc">Priority (Low to High)</option>
         </select>
       </div>
     </div>
@@ -43,7 +44,6 @@ const MainApp = () => {
   const [status, setStatus] = useState('Loading application...');
   const GUEST_TODOS_KEY = 'guestTodos';
 
-  // State for filtering and sorting
   const [filter, setFilter] = useState('all'); // 'all', 'active', 'completed'
   const [sortBy, setSortBy] = useState('date-desc'); // 'date-desc', 'date-asc', 'alpha-asc', 'alpha-desc'
 
@@ -181,7 +181,6 @@ const MainApp = () => {
     setTodos(prevTodos => [optimisticTodo, ...prevTodos]);
     setStatus('Adding todo...');
 
-
     if (user) {
       const { data, error } = await supabase
         .from('todos')
@@ -217,14 +216,12 @@ const MainApp = () => {
     };
     const todoId = updatedTodo.id;
 
-    // Optimistic UI update
     const originalTodos = [...todos];
     const updatedTodosState = todos.map((todo) =>
       todo.id === todoId ? { ...todo, ...fieldsToUpdate } : todo
     );
     setTodos(updatedTodosState);
     setStatus('Updating todo...');
-
 
     if (user) {
       const { error } = await supabase
@@ -270,15 +267,13 @@ const MainApp = () => {
       if (error) {
         console.error('Error deleting todo from Supabase:', error);
         setStatus(`Failed to delete todo: ${error.message}`);
-        setTodos(originalTodos); // Revert on error
+        setTodos(originalTodos);
       } else {
         setStatus('Todo deleted successfully');
-        // State already updated optimistically
       }
     } else if (isGuestMode) {
       saveGuestTodos(updatedTodosState);
       setStatus('Todo deleted successfully (Guest Mode)');
-      // State already updated optimistically
     } else {
       console.error("Cannot delete todo: No user and not in guest mode.");
       setStatus("Cannot delete todo. Please log in or use Guest mode.");
@@ -287,7 +282,7 @@ const MainApp = () => {
   };
 
 
-  // Filtering and Sorting Logic 
+  // Filtering and Sorting Logic
   const filteredAndSortedTodos = useMemo(() => {
     let result = [...todos];
 
@@ -307,6 +302,10 @@ const MainApp = () => {
           return (a.text || '').localeCompare(b.text || '');
         case 'alpha-desc':
           return (b.text || '').localeCompare(a.text || '');
+        case 'priority-desc':
+          return PRIORITIES.indexOf(a.priority) - PRIORITIES.indexOf(b.priority);
+        case 'priority-asc':
+          return PRIORITIES.indexOf(b.priority) - PRIORITIES.indexOf(a.priority);
         case 'date-desc':
         default:
           const dateADesc = a.created_at ? new Date(a.created_at) : new Date(0);
@@ -318,8 +317,13 @@ const MainApp = () => {
     return result;
   }, [todos, filter, sortBy]);
 
+  const completedTasksPercentage = useMemo(() => {
+    if (todos.length === 0) return 0;
+    const completedCount = todos.filter(todo => todo.completed).length;
+    return (completedCount / todos.length) * 100;
+  }, [todos]);
 
-  // --- Render Logic 
+  // Render Logic 
   const renderEmptyListMessage = () => {
     if (status.startsWith('Loading')) {
       return 'Loading...';
@@ -358,6 +362,10 @@ const MainApp = () => {
           )}
 
           { }
+          {/* Display the percentage */}
+          <p>Tasks Completed: {completedTasksPercentage.toFixed(0)}%</p>
+
+          { }
           {filteredAndSortedTodos.length > 0 ? (
             <ul>
               {filteredAndSortedTodos.map((todo) => (
@@ -370,7 +378,6 @@ const MainApp = () => {
               ))}
             </ul>
           ) : (
-            // Display appropriate message when list is empty or filtered to empty
             <p style={{ fontStyle: 'italic', color: '#888', marginTop: '30px', textAlign: 'center' }}>
               {renderEmptyListMessage()}
             </p>
@@ -402,7 +409,6 @@ const MainApp = () => {
   );
 };
 
-// Root App component setting up the Router
 const App = () => {
   return (
     <Routes>
