@@ -1,5 +1,5 @@
 // App.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import TodoForm from './components/TodoForm';
 import TodoItem from './components/TodoItem';
 import Auth from './components/Auth';
@@ -9,7 +9,33 @@ import { PRIORITIES, DEFAULT_PRIORITY } from './components/constants';
 import './App.css';
 import { Routes, Route } from 'react-router-dom';
 
-// Main application view (Todos list or Auth)
+// Filter and Sort Controls Component
+const FilterControls = ({ filter, setFilter, sortBy, setSortBy }) => {
+  return (
+    <div className="filter-sort-controls">
+      <div className="filter-group">
+        <label htmlFor="filter">Show:</label>
+        <select id="filter" value={filter} onChange={(e) => setFilter(e.target.value)}>
+          <option value="all">All</option>
+          <option value="active">Active</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+      <div className="sort-group">
+        <label htmlFor="sort">Sort By:</label>
+        <select id="sort" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+          <option value="date-desc">Date (Newest First)</option>
+          <option value="date-asc">Date (Oldest First)</option>
+          <option value="alpha-asc">Alphabetical (A-Z)</option>
+          <option value="alpha-desc">Alphabetical (Z-A)</option>
+          { }
+        </select>
+      </div>
+    </div>
+  );
+};
+
+// Main Application View
 const MainApp = () => {
   const [todos, setTodos] = useState([]);
   const { user, signOut, supabase } = useAuth();
@@ -17,63 +43,52 @@ const MainApp = () => {
   const [status, setStatus] = useState('Loading application...');
   const GUEST_TODOS_KEY = 'guestTodos';
 
-  // Effect to handle user authentication state changes and guest mode logic
+  // State for filtering and sorting
+  const [filter, setFilter] = useState('all'); // 'all', 'active', 'completed'
+  const [sortBy, setSortBy] = useState('date-desc'); // 'date-desc', 'date-asc', 'alpha-asc', 'alpha-desc'
+
+  // Effect for Auth State and Guest Mode Logic
   useEffect(() => {
-    // console.log("Auth State/Mount Effect: Current user:", user); // Optional debug log
     const storedGuest = localStorage.getItem('isGuest');
 
     if (user) {
-      // User is logged in: Clear guest state, load Supabase data
-      // console.log("User detected. Clearing guest status, fetching Supabase data.");
       if (isGuestMode) setIsGuestMode(false);
       localStorage.removeItem('isGuest');
       deleteCookie(GUEST_TODOS_KEY);
       fetchTodosFromSupabase();
-      // Status is set within fetchTodosFromSupabase or if error occurs
+      setFilter('all'); // Reset filter on login
+      setSortBy('date-desc'); // Reset sort on login
     } else if (storedGuest === 'true') {
-      // No user, but guest flag exists: Enter guest mode
-      // console.log("No user, but guest flag found. Entering Guest Mode.");
       setIsGuestMode(true);
       loadGuestTodos();
       setStatus('Guest Mode');
+      setFilter('all'); // Reset filter on guest mode entry
+      setSortBy('date-desc'); // Reset sort on guest mode entry
     } else {
-      // No user, no guest flag: Show Auth component
-      // console.log("No user or guest flag. Displaying Auth page.");
       if (isGuestMode) setIsGuestMode(false);
       setTodos([]);
       setStatus('Please log in or continue as Guest');
     }
-    // This effect should primarily react to changes in the user object
-  }, [user]); // Only re-run the effect if the user object changes
+  }, [user]);
 
-  // --- Guest Mode Management ---
-
-  // Called when 'Continue as Guest' button is clicked in Auth component
+  // Guest Mode Management
   const handleGuestSignIn = () => {
-    // console.log("Handling Guest Sign In");
     localStorage.setItem('isGuest', 'true');
     setIsGuestMode(true);
-    // Let useEffect handle loading/status based on new state
   };
 
-  // Called when 'Back to Login' link is clicked in Guest Mode
   const handleBackToLogin = () => {
-    // console.log("Handling Back to Login from Guest Mode");
     localStorage.removeItem('isGuest');
     deleteCookie(GUEST_TODOS_KEY);
     setIsGuestMode(false);
-    // Let useEffect handle clearing todos and setting status
   };
 
-  // Load guest todos from cookie storage
   const loadGuestTodos = () => {
-    // console.log("Loading guest todos from cookie");
     setStatus('Loading guest tasks...');
     const storedTodos = getCookie(GUEST_TODOS_KEY);
     if (storedTodos) {
       try {
         const parsedTodos = JSON.parse(storedTodos);
-        // Ensure todos have default properties for robustness
         const todosWithDefaults = parsedTodos.map(todo => ({
           id: todo.id || crypto.randomUUID(),
           text: todo.text || '',
@@ -82,23 +97,18 @@ const MainApp = () => {
           created_at: todo.created_at || new Date().toISOString()
         }));
         setTodos(todosWithDefaults);
-        // console.log("Guest todos loaded:", todosWithDefaults.length);
       } catch (e) {
-        console.error("Failed to parse guest todos from cookie:", e);
+        console.error("Failed to parse guest todos:", e);
         setTodos([]);
-        setCookie(GUEST_TODOS_KEY, JSON.stringify([]), 7); // Reset cookie on error
-         setStatus('Error loading guest tasks.');
+        setCookie(GUEST_TODOS_KEY, JSON.stringify([]), 7);
+        setStatus('Error loading guest tasks.');
       }
     } else {
-      // console.log("No guest todos found in cookie");
       setTodos([]);
     }
-     // Status will be updated by useEffect or subsequent actions
   };
 
-  // Save current guest todos list to cookie storage
   const saveGuestTodos = (currentTodos) => {
-    // console.log("Saving guest todos to cookie");
     const todosToSave = currentTodos.map(todo => ({
       id: todo.id,
       text: todo.text,
@@ -106,82 +116,73 @@ const MainApp = () => {
       priority: todo.priority,
       created_at: todo.created_at
     }));
-    setCookie(GUEST_TODOS_KEY, JSON.stringify(todosToSave), 7); // 7-day expiry
-    // console.log("Guest todos saved:", todosToSave.length);
+    setCookie(GUEST_TODOS_KEY, JSON.stringify(todosToSave), 7);
   };
 
-
-  // --- Supabase Data Management ---
-
-  // Fetch todos for the logged-in user from Supabase
+  // Supabase Data Management
   const fetchTodosFromSupabase = async () => {
-    if (!user) {
-       // console.warn("fetchTodosFromSupabase called without a user."); // Optional warning
-       return;
-    }
-    // console.log("Fetching Supabase todos for user:", user.id);
+    if (!user) return;
     setStatus('Loading tasks...');
     const { data, error } = await supabase
       .from('todos')
       .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false }); // Show newest first
+      .eq('user_id', user.id);
 
     if (error) {
       console.error('Error fetching Supabase todos:', error);
       setStatus(`Failed to load tasks: ${error.message}`);
       setTodos([]);
     } else {
-      // Ensure default priority if null in DB
       const fetchedTodos = data.map(todo => ({
         ...todo,
         priority: todo.priority || DEFAULT_PRIORITY
       }));
       setTodos(fetchedTodos);
-      setStatus(`Logged in as ${user.email}`); // Update status after loading
-      // console.log("Supabase todos fetched:", fetchedTodos.length);
+      setStatus(`Logged in as ${user.email}`);
     }
   };
 
-  // Handle user sign out
+  // User Sign Out
   const handleSignOut = async () => {
-    // console.log("Handling Sign Out");
     setStatus('Signing out...');
     const { error } = await signOut();
-     if (error) {
-        console.error("Sign out error:", error);
-        setStatus(`Sign out failed: ${error.message}`);
-     } else {
-        // User state becomes null via AuthProvider, triggering useEffect
-        // Clean up guest state redundantly just in case
-        localStorage.removeItem('isGuest');
-        deleteCookie(GUEST_TODOS_KEY);
-        setIsGuestMode(false);
-        setTodos([]);
-        setStatus('Signed out successfully');
-     }
+    if (error) {
+      console.error("Sign out error:", error);
+      setStatus(`Sign out failed: ${error.message}`);
+    } else {
+      localStorage.removeItem('isGuest');
+      deleteCookie(GUEST_TODOS_KEY);
+      setIsGuestMode(false);
+      setTodos([]);
+      setFilter('all');
+      setSortBy('date-desc');
+    }
   };
 
-
-  // --- CRUD Operations ---
-
-  // Add a new todo (handles both logged-in and guest users)
+  // CRUD Operations
   const addTodo = async (text, priority) => {
     const trimmedText = text.trim();
-    if (!trimmedText) {
-      // console.warn("Attempted to add empty todo"); // Optional warning
-      return; // Prevent adding empty todos
-    }
+    if (!trimmedText) return;
+
     const newTodoData = {
       text: trimmedText,
       priority: priority || DEFAULT_PRIORITY,
       completed: false
     };
+    const optimisticId = crypto.randomUUID();
+    const optimisticTodo = {
+      ...newTodoData,
+      id: optimisticId,
+      created_at: new Date().toISOString(),
+      user_id: user ? user.id : undefined
+    };
+
+    // Prepend to the local state immediately
+    setTodos(prevTodos => [optimisticTodo, ...prevTodos]);
     setStatus('Adding todo...');
 
+
     if (user) {
-      // Add to Supabase
-      // console.log("Adding todo to Supabase");
       const { data, error } = await supabase
         .from('todos')
         .insert({ ...newTodoData, user_id: user.id })
@@ -191,32 +192,23 @@ const MainApp = () => {
       if (error) {
         console.error('Error adding todo to Supabase:', error);
         setStatus(`Failed to add todo: ${error.message}`);
+        setTodos(prevTodos => prevTodos.filter(t => t.id !== optimisticId));
       } else if (data) {
-        setTodos(prevTodos => [ { ...data, priority: data.priority || DEFAULT_PRIORITY }, ...prevTodos]); // Prepend new todo
+        setTodos(prevTodos => prevTodos.map(t =>
+          t.id === optimisticId ? { ...data, priority: data.priority || DEFAULT_PRIORITY } : t
+        ));
         setStatus('Todo added successfully');
-        // console.log("Todo added to Supabase:", data.id);
       }
     } else if (isGuestMode) {
-      // Add locally for guest
-      // console.log("Adding todo for Guest");
-      const newGuestTodo = {
-        ...newTodoData,
-        id: crypto.randomUUID(),
-        created_at: new Date().toISOString()
-      };
-      const updatedTodos = [newGuestTodo, ...todos]; // Prepend new todo
-      setTodos(updatedTodos);
-      saveGuestTodos(updatedTodos);
+      saveGuestTodos([optimisticTodo, ...todos.filter(t => t.id !== optimisticId)]); // Save updated list
       setStatus('Todo added successfully (Guest Mode)');
-      // console.log("Guest todo added:", newGuestTodo.id);
     } else {
-       // Should not happen if UI logic is correct, but good failsafe
-       console.error("Cannot add todo: No user and not in guest mode.");
-       setStatus("Cannot add todo. Please log in or use Guest mode.");
+      console.error("Cannot add todo: No user and not in guest mode.");
+      setStatus("Cannot add todo. Please log in or use Guest mode.");
+      setTodos(prevTodos => prevTodos.filter(t => t.id !== optimisticId));
     }
   };
 
-  // Update an existing todo (handles text, completion, priority)
   const updateTodo = async (updatedTodo) => {
     const fieldsToUpdate = {
       text: updatedTodo.text,
@@ -224,128 +216,177 @@ const MainApp = () => {
       priority: updatedTodo.priority,
     };
     const todoId = updatedTodo.id;
+
+    // Optimistic UI update
+    const originalTodos = [...todos];
+    const updatedTodosState = todos.map((todo) =>
+      todo.id === todoId ? { ...todo, ...fieldsToUpdate } : todo
+    );
+    setTodos(updatedTodosState);
     setStatus('Updating todo...');
 
+
     if (user) {
-      // Update in Supabase
-      // console.log("Updating todo in Supabase:", todoId);
       const { error } = await supabase
         .from('todos')
         .update(fieldsToUpdate)
         .eq('id', todoId)
-        .eq('user_id', user.id); // Ensure ownership
+        .eq('user_id', user.id);
 
       if (error) {
         console.error('Error updating todo in Supabase:', error);
         setStatus(`Failed to update todo: ${error.message}`);
+        setTodos(originalTodos);
       } else {
-        // Update local state
-        const updatedTodos = todos.map((todo) =>
-          todo.id === todoId ? { ...todo, ...fieldsToUpdate } : todo
-        );
-        setTodos(updatedTodos);
         setStatus('Todo updated successfully');
-        // console.log("Todo updated in Supabase:", todoId);
+        // State already updated optimistically
       }
     } else if (isGuestMode) {
-      // Update locally for guest
-      // console.log("Updating guest todo:", todoId);
-      const updatedTodos = todos.map((todo) =>
-        todo.id === todoId ? { ...todo, ...fieldsToUpdate } : todo
-      );
-      setTodos(updatedTodos);
-      saveGuestTodos(updatedTodos);
+      saveGuestTodos(updatedTodosState);
       setStatus('Todo updated successfully (Guest Mode)');
-      // console.log("Guest todo updated:", todoId);
+      // State already updated optimistically
     } else {
-       console.error("Cannot update todo: No user and not in guest mode.");
-       setStatus("Cannot update todo. Please log in or use Guest mode.");
+      console.error("Cannot update todo: No user and not in guest mode.");
+      setStatus("Cannot update todo. Please log in or use Guest mode.");
+      setTodos(originalTodos); // Revert
     }
   };
 
-  // Delete a todo
   const deleteTodo = async (id) => {
-     // Optional: Confirmation dialog
-     // if (!window.confirm("Are you sure you want to delete this todo?")) return;
-     setStatus('Deleting todo...');
+    // Optional: Confirmation dialog
+    // if (!window.confirm("Are you sure you want to delete this todo?")) return;
+    const originalTodos = [...todos];
+    const updatedTodosState = todos.filter((todo) => todo.id !== id);
+    setTodos(updatedTodosState);
+    setStatus('Deleting todo...');
 
     if (user) {
-      // Delete from Supabase
-      // console.log("Deleting todo from Supabase:", id);
       const { error } = await supabase
         .from('todos')
         .delete()
         .eq('id', id)
-        .eq('user_id', user.id); // Ensure ownership
+        .eq('user_id', user.id);
 
       if (error) {
         console.error('Error deleting todo from Supabase:', error);
         setStatus(`Failed to delete todo: ${error.message}`);
+        setTodos(originalTodos); // Revert on error
       } else {
-        // Remove from local state
-        setTodos(currentTodos => currentTodos.filter((todo) => todo.id !== id));
         setStatus('Todo deleted successfully');
-        // console.log("Todo deleted from Supabase:", id);
+        // State already updated optimistically
       }
     } else if (isGuestMode) {
-      // Delete locally for guest
-      // console.log("Deleting guest todo:", id);
-      const updatedTodos = todos.filter((todo) => todo.id !== id);
-      setTodos(updatedTodos);
-      saveGuestTodos(updatedTodos);
+      saveGuestTodos(updatedTodosState);
       setStatus('Todo deleted successfully (Guest Mode)');
-      // console.log("Guest todo deleted:", id);
+      // State already updated optimistically
     } else {
       console.error("Cannot delete todo: No user and not in guest mode.");
-       setStatus("Cannot delete todo. Please log in or use Guest mode.");
+      setStatus("Cannot delete todo. Please log in or use Guest mode.");
+      setTodos(originalTodos);
     }
   };
 
-  // --- Render Logic ---
+
+  // Filtering and Sorting Logic 
+  const filteredAndSortedTodos = useMemo(() => {
+    let result = [...todos];
+
+    if (filter === 'active') {
+      result = result.filter(todo => !todo.completed);
+    } else if (filter === 'completed') {
+      result = result.filter(todo => todo.completed);
+    }
+
+    result.sort((a, b) => {
+      switch (sortBy) {
+        case 'date-asc':
+          const dateA = a.created_at ? new Date(a.created_at) : new Date(0);
+          const dateB = b.created_at ? new Date(b.created_at) : new Date(0);
+          return dateA - dateB;
+        case 'alpha-asc':
+          return (a.text || '').localeCompare(b.text || '');
+        case 'alpha-desc':
+          return (b.text || '').localeCompare(a.text || '');
+        case 'date-desc':
+        default:
+          const dateADesc = a.created_at ? new Date(a.created_at) : new Date(0);
+          const dateBDesc = b.created_at ? new Date(b.created_at) : new Date(0);
+          return dateBDesc - dateADesc;
+      }
+    });
+
+    return result;
+  }, [todos, filter, sortBy]);
+
+
+  // --- Render Logic 
+  const renderEmptyListMessage = () => {
+    if (status.startsWith('Loading')) {
+      return 'Loading...';
+    }
+    if (todos.length === 0) {
+      return 'No tasks yet. Add one above!';
+    }
+    if (filteredAndSortedTodos.length === 0 && todos.length > 0) {
+      // This means filters are active but hide all todos
+      return `No tasks match the current filter ('${filter}').`;
+    }
+    return '';
+  };
+
   return (
     <div className="container">
       <h1>Tasky</h1>
       <p>A simple todo list web app using React & Supabase</p>
 
-      {/* Display Auth component if not logged in AND not in guest mode */}
       {!user && !isGuestMode && (
         <Auth onGuestSignIn={handleGuestSignIn} />
       )}
 
-      {/* Display Todo list and controls if logged in OR in guest mode */}
       {(user || isGuestMode) && (
         <>
           <TodoForm onAdd={addTodo} />
-          {todos.length > 0 ? (
-             <ul>
-               {todos.map((todo) => (
-                 <TodoItem
-                   key={todo.id}
-                   todo={todo}
-                   onUpdate={updateTodo}
-                   onDelete={deleteTodo}
-                 />
-               ))}
-             </ul>
-           ) : (
-             // Display message if list is empty or loading
-             <p style={{ fontStyle: 'italic', color: '#888', marginTop: '30px' }}>
-               {status.startsWith('Loading') ? 'Loading...' : 'No tasks yet. Add one above!'}
-             </p>
-           )
+
+          { }
+          {todos.length > 0 && (
+            <FilterControls
+              filter={filter}
+              setFilter={setFilter}
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+            />
+          )}
+
+          { }
+          {filteredAndSortedTodos.length > 0 ? (
+            <ul>
+              {filteredAndSortedTodos.map((todo) => (
+                <TodoItem
+                  key={todo.id}
+                  todo={todo}
+                  onUpdate={updateTodo}
+                  onDelete={deleteTodo}
+                />
+              ))}
+            </ul>
+          ) : (
+            // Display appropriate message when list is empty or filtered to empty
+            <p style={{ fontStyle: 'italic', color: '#888', marginTop: '30px', textAlign: 'center' }}>
+              {renderEmptyListMessage()}
+            </p>
+          )
           }
-          {/* Status Area with conditional links */}
+
+          { }
           <div className="status-area">
-             <p className="status-text">
+            <p className="status-text">
               {status}
-              {/* Show Sign Out only if logged in */}
               {user && (
                 <>
                   <span>|</span>
                   <a href="#" onClick={(e) => { e.preventDefault(); handleSignOut(); }} className="status-link">Sign Out</a>
                 </>
               )}
-              {/* Show Back to Login only if in Guest Mode */}
               {isGuestMode && (
                 <>
                   <span>|</span>
@@ -356,7 +397,7 @@ const MainApp = () => {
           </div>
         </>
       )}
-    <div className='footer'>Copyright &copy; 2025 shoukelp</div>
+      <div className='footer'>Copyright &copy; 2025 shoukelp</div>
     </div>
   );
 };
@@ -365,9 +406,7 @@ const MainApp = () => {
 const App = () => {
   return (
     <Routes>
-      {/* Main route renders the core application logic */}
       <Route path="/" element={<MainApp />} />
-      {/* Add other application routes here if needed */}
     </Routes>
   );
 };

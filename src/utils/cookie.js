@@ -1,23 +1,26 @@
 // utils/cookie.js
 export function getCookie(name) {
-  // Get all cookies as a single string and split into individual cookies
   const cookies = document.cookie.split(';');
   for (let i = 0; i < cookies.length; i++) {
     let cookie = cookies[i].trim();
     if (cookie.startsWith(name + '=')) {
-      return cookie.substring(name.length + 1);
+      return decodeURIComponent(cookie.substring(name.length + 1));
     }
   }
   return null;
 }
 
 export function setCookie(name, value, days) {
-  const date = new Date();
-  date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-  const expires = "expires=" + date.toUTCString();
-  document.cookie = name + "=" + value + ";" + expires + ";path=/";
+  let expires = "";
+  if (days) {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    expires = "; expires=" + date.toUTCString();
+  }
+  document.cookie = name + "=" + (encodeURIComponent(value) || "") + expires + "; path=/; SameSite=Lax"; // Added SameSite attribute
 }
 
 export function deleteCookie(name) {
-  document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  // Set expiry date to the past to delete the cookie
+  document.cookie = name + '=; Max-Age=-99999999; path=/; SameSite=Lax';
 }

@@ -5,7 +5,6 @@ import googleIcon from '../assets/icons/google-icon.svg';
 import guestIcon from '../assets/icons/guest-icon.svg';
 import authIcon from '../assets/icons/auth-icon.svg';
 
-// Auth component handles Sign Up, Sign In, Google OAuth, and Guest login
 const Auth = ({ onGuestSignIn }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
@@ -14,19 +13,16 @@ const Auth = ({ onGuestSignIn }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Basic email format validation
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(String(email).toLowerCase());
   };
 
-  // Handles submission for email/password Sign Up or Sign In
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    // Input Validations
     if (!email || !password) {
       setError('Email and password must not be empty.');
       setLoading(false);
@@ -46,86 +42,69 @@ const Auth = ({ onGuestSignIn }) => {
     try {
       let authResponse;
       if (isSignUp) {
-        // Sign Up attempt
         authResponse = await signUp(email, password);
         if (authResponse.error) {
-           // Handle specific Sign Up errors from Supabase
-           if (authResponse.error.message.includes('User already registered')) {
-             setError('Email already registered. Please Sign In.');
-           } else if (authResponse.error.message.includes('Email rate limit exceeded')) {
-              setError('Too many sign up attempts. Please try again later.');
-           } else {
-             setError(`Sign up failed: ${authResponse.error.message}`);
-           }
-        } else {
-           // Successful Sign Up (actual user state update happens via onAuthStateChange listener)
-           console.log('Sign up successful', authResponse); // Optional success log
+          if (authResponse.error.message.includes('User already registered')) {
+            setError('Email already registered. Please Sign In.');
+          } else if (authResponse.error.message.includes('Email rate limit exceeded')) {
+            setError('Too many sign up attempts. Please try again later.');
+          } else {
+            setError(`Sign up failed: ${authResponse.error.message}`);
+          }
         }
+        // Success handled by onAuthStateChange listener in useAuth
       } else {
-        // Sign In attempt
         authResponse = await signIn(email, password);
         if (authResponse.error) {
-          // Handle specific Sign In errors from Supabase
           if (authResponse.error.message.includes('Invalid login credentials')) {
-             setError('Incorrect email or password.');
+            setError('Incorrect email or password.');
           } else if (authResponse.error.message.includes('Email not confirmed')) {
-             setError('Please confirm your email address first.');
+            setError('Please confirm your email address first.');
           } else {
             setError(`Sign in failed: ${authResponse.error.message}`);
           }
-        } else {
-          // Successful Sign In (actual user state update happens via onAuthStateChange listener)
-          console.log('Sign in successful', authResponse); // Optional success log
         }
+        // Success handled by onAuthStateChange listener in useAuth
       }
     } catch (err) {
       console.error('Auth error during email/password submission:', err);
       setError('An unexpected error occurred. Please try again.');
     } finally {
-       setLoading(false); // Ensure loading is stopped
+      setLoading(false);
     }
   };
 
-  // Handles the initiation of the Google OAuth Sign-in flow
   const handleGoogleSignIn = async () => {
     setError('');
     setLoading(true);
     try {
-      // Define redirect URLs based on the environment (development vs. production)
       const redirectUrl =
         process.env.NODE_ENV === 'development'
-          ? 'http://localhost:3000/' // Adjust port if necessary for local dev
-          : 'https://shoukelp.github.io/todo-app/'; // Production URL on GitHub Pages
+          ? 'http://localhost:3000/' // Adjust port if necessary
+          : 'https://shoukelp.github.io/todo-app/'; // Production URL
 
-      // console.log('Attempting Google Sign in with redirect to:', redirectUrl); // Optional debug log
-
-      // Call Supabase OAuth function
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: redirectUrl,
-          // scopes: '...', // Add additional Google scopes if needed
         },
       });
 
-      // Catch errors that might occur before the user is redirected to Google
       if (oauthError) {
         throw oauthError;
       }
-      // If successful, the browser navigates away, so loading state remains true until page reloads
 
     } catch (err) {
       console.error('Google sign-in initiation error:', err);
       setError(`Failed to initiate Google Sign in: ${err.message || 'Unknown error'}`);
-      setLoading(false); // Stop loading only if an error happens *before* redirect
+      setLoading(false);
     }
   };
 
-  // Handles the "Continue as Guest" button click
   const handleGuestLogin = () => {
-    localStorage.setItem('isGuest', 'true'); // Set flag in local storage
+    localStorage.setItem('isGuest', 'true');
     if (onGuestSignIn) {
-      onGuestSignIn(); // Notify parent component (App.js) to update state
+      onGuestSignIn();
     }
   };
 
@@ -141,7 +120,8 @@ const Auth = ({ onGuestSignIn }) => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           autoComplete="email"
-          disabled={loading} // Disable inputs during auth operations
+          disabled={loading}
+          aria-label="Email"
         />
         <input
           type="password"
@@ -150,11 +130,11 @@ const Auth = ({ onGuestSignIn }) => {
           onChange={(e) => setPassword(e.target.value)}
           autoComplete={isSignUp ? "new-password" : "current-password"}
           disabled={loading}
+          aria-label="Password"
         />
 
-        {/* Authentication Buttons */}
         <button type="submit" disabled={loading}>
-          <img src={authIcon} alt="" /> {/* Alt can be empty for decorative icons */}
+          <img src={authIcon} alt="" />
           <span>{loading ? (isSignUp ? 'Signing Up...' : 'Signing In...') : (isSignUp ? 'Sign Up' : 'Sign In')}</span>
         </button>
 
@@ -169,21 +149,42 @@ const Auth = ({ onGuestSignIn }) => {
         </button>
       </form>
 
-      {/* Toggle between Sign In and Sign Up views */}
       <p>
         {isSignUp ? (
           <>
             Already have an account?{' '}
-            <span className="auth-toggle-link" onClick={() => !loading && setIsSignUp(false)}>
+            {/* Ganti button menjadi a */}
+            <a
+              href="#"
+              className="auth-toggle-link"
+              onClick={(e) => {
+                e.preventDefault();
+                if (!loading) {
+                  setIsSignUp(false);
+                }
+              }}
+              style={loading ? { pointerEvents: 'none', opacity: 0.6 } : {}}
+            >
               Sign In
-            </span>
+            </a>
           </>
         ) : (
           <>
             Don't have an account?{' '}
-            <span className="auth-toggle-link" onClick={() => !loading && setIsSignUp(true)}>
+            { }
+            <a
+              href="#"
+              className="auth-toggle-link"
+              onClick={(e) => {
+                e.preventDefault();
+                if (!loading) {
+                  setIsSignUp(true);
+                }
+              }}
+              style={loading ? { pointerEvents: 'none', opacity: 0.6 } : {}}
+            >
               Sign Up
-            </span>
+            </a>
           </>
         )}
       </p>
