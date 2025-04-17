@@ -256,7 +256,9 @@ REACT_APP_SUPABASE_URL=https://<YOUR_PROJECT_REF>.supabase.co
 REACT_APP_SUPABASE_ANON_KEY=<YOUR_SUPABASE_ANON_KEY>
 ```
 
-Penting: Pastikan nama variabel (misal: REACT_APP_SUPABASE_URL) sesuai dengan yang digunakan di kode Anda (src/hooks/useAuth.js). Jika Anda menggunakan Vite (seperti dalam konfigurasi vite.config.js yang ada), prefix standarnya adalah VITE_. Jika Anda tetap menggunakan REACT_APP_ dengan Vite, pastikan konfigurasi Vite Anda mengenali prefix tersebut atau ubah kode untuk menggunakan VITE_. Mari kita asumsikan kode Anda sudah disesuaikan untuk REACT_APP_ atau Anda akan menyesuaikannya.
+> [!Warning]
+> Penting:
+> Pastikan nama variabel (misal: REACT_APP_SUPABASE_URL) sesuai dengan yang digunakan di kode Anda (src/hooks/useAuth.js). Mari kita asumsikan kode Anda sudah disesuaikan untuk REACT_APP_ atau Anda akan menyesuaikannya.
 
 ### 🚀 6. Menjalankan Aplikasi Lokal
 
@@ -357,4 +359,7 @@ Jika Anda ingin berkontribusi:
 
 Didistribusikan di bawah Lisensi MIT. Lihat LICENSE untuk informasi lebih lanjut.
 
-    📝 Catatan: Gantilah placeholder seperti <YOUR_PROJECT_REF>, REACT_APP_SUPABASE_URL, REACT_APP_SUPABASE_ANON_KEY, <username_github>, dan <NAMA_REPOSITORI> sesuai dengan konfigurasi proyek Anda. Pastikan prefix environment variable (REACT_APP_ atau VITE_) konsisten antara file .env dan penggunaannya di dalam kode.
+> [!Note]
+> 📝 Catatan:
+> 
+> Gantilah placeholder seperti <YOUR_PROJECT_REF>, REACT_APP_SUPABASE_URL, REACT_APP_SUPABASE_ANON_KEY, <username_github>, dan <NAMA_REPOSITORI> sesuai dengan konfigurasi proyek Anda. Pastikan prefix environment variable (REACT_APP_ atau VITE_) konsisten antara file .env dan penggunaannya di dalam kode.
