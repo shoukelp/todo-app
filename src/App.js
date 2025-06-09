@@ -6,7 +6,6 @@ import Auth from './components/Auth';
 import { useAuth } from './hooks/useAuth';
 import { getCookie, setCookie, deleteCookie } from './utils/cookie';
 import { PRIORITIES, DEFAULT_PRIORITY } from './components/constants';
-import './App.css';
 import { Routes, Route } from 'react-router-dom';
 
 // Filter and Sort Controls Component
@@ -404,7 +403,7 @@ const MainApp = () => {
           </div>
         </>
       )}
-      <div className='footer'>Copyright &copy; 2025 shoukelp</div>
+      <div className='footer'>Copyright &copy; 2025 <a href="https://shoukelp.pages.dev/">shoukelp</a></div>
     </div>
   );
 };
