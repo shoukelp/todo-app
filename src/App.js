@@ -303,9 +303,9 @@ const MainApp = () => {
         case 'alpha-desc':
           return (b.text || '').localeCompare(a.text || '');
         case 'priority-desc':
-          return PRIORITIES.indexOf(a.priority) - PRIORITIES.indexOf(b.priority);
-        case 'priority-asc':
           return PRIORITIES.indexOf(b.priority) - PRIORITIES.indexOf(a.priority);
+        case 'priority-asc':
+          return PRIORITIES.indexOf(a.priority) - PRIORITIES.indexOf(b.priority);
         case 'date-desc':
         default:
           const dateADesc = a.created_at ? new Date(a.created_at) : new Date(0);
