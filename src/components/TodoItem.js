@@ -1,4 +1,3 @@
-// components/TodoItem.js
 import React, { useState } from 'react';
 import { PRIORITIES, DEFAULT_PRIORITY } from './constants';
 
@@ -28,7 +27,6 @@ const TodoItem = ({ todo, onUpdate, onDelete }) => {
     if (!isoString) return '';
     try {
       const date = new Date(isoString);
-      // Check if the date is valid
       if (isNaN(date.getTime())) {
           console.warn("Invalid date encountered in formatDateTime:", isoString);
           return 'Invalid date';

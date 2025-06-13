@@ -1,4 +1,3 @@
-// App.js
 import React, { useState, useEffect, useMemo } from 'react';
 import TodoForm from './components/TodoForm';
 import TodoItem from './components/TodoItem';

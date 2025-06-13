@@ -1,4 +1,3 @@
-// components/Auth.js
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import googleIcon from '../assets/icons/google-icon.svg';
@@ -153,7 +152,7 @@ const Auth = ({ onGuestSignIn }) => {
         {isSignUp ? (
           <>
             Already have an account?{' '}
-            {/* Ganti button menjadi a */}
+            { }
             <a
               href="#"
               className="auth-toggle-link"

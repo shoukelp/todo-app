@@ -1,4 +1,3 @@
-// components/TodoForm.js
 import React, { useState } from 'react';
 import { PRIORITIES, DEFAULT_PRIORITY } from './constants';
 
