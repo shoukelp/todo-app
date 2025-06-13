@@ -1,0 +1,48 @@
+name: Build and Push to Main Repo
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Checkout target repo
+        uses: actions/checkout@v4
+        with:
+          repository: shoukelp/shoukelp
+          ref: pages
+          token: ${{ secrets.TARGET_REPO_TOKEN }}
+          path: shoukelp
+
+      - name: Copy build output to public/todo-app folder
+        run: |
+          rm -rf shoukelp/public/todo-app
+          mkdir -p shoukelp/public/todo-app
+          cp -r build/* shoukelp/public/todo-app/
+
+      - name: Commit and push to target repo
+        run: |
+          cd shoukelp
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add .
+          git commit -m "Deploy CRA build to public/todo-app from todo-app repo on 'pages' branch @ ${{ github.sha }}" || echo "No changes to commit"
+          git push origin pages
